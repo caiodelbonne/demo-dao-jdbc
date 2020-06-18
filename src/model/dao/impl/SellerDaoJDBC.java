@@ -52,16 +52,8 @@ public class SellerDaoJDBC implements SellerDao {
 		rs= st.executeQuery();
 	// cria um obj como retorono assosiado a um depart 	
 		if(rs.next()) {
-			Department dep = new Department();
-			dep.setId(rs.getInt("DepartmentId"));
-			dep.setName(rs.getString("DepName"));
-			Seller obj = new Seller();
-			obj.setId(rs.getInt("Id"));
-			obj.setName(rs.getString("Name"));
-			obj.setEmail(rs.getString("Email"));
-			obj.setBaseSalary(rs.getDouble("BaseSalary"));
-			obj.setBirthDate(rs.getDate("BirthDate"));
-			obj.setDepartment(dep); // objeto departmento montado que é a variavel temp
+			Department dep = instantiateDepartment(rs);
+			Seller obj = instantiateSeller(rs,dep);
 			return obj;
 		}
 		return null; // nao existe vendedor com id 
@@ -74,6 +66,24 @@ public class SellerDaoJDBC implements SellerDao {
 			DB.closeResultSet(rs);
 			// nao fecha a conn pq isso é uma query // fecha noo programa
 		}
+	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException { // cap exception
+		Seller obj =new Seller();
+		obj.setId(rs.getInt("Id"));
+		obj.setName(rs.getString("Name"));
+		obj.setEmail(rs.getString("Email"));
+		obj.setBaseSalary(rs.getDouble("BaseSalary"));
+		obj.setBirthDate(rs.getDate("BirthDate"));
+		obj.setDepartment(dep); // objeto departmento montado que é a variavel temp
+		return obj;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));		
+		return null;
 	}
 
 	@Override
