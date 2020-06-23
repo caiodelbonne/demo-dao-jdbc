@@ -73,7 +73,7 @@ public class SellerDaoJDBC implements SellerDao {
 		obj.setEmail(rs.getString("Email"));
 		obj.setBaseSalary(rs.getDouble("BaseSalary"));
 		obj.setBirthDate(rs.getDate("BirthDate"));
-		obj.setDepartment(dep);//  variavel temporaria 
+		obj.setDepartment(dep);// variavel temporaria
 		return obj;
 	}
 
@@ -86,8 +86,48 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName " 
+							+ "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " 	
+							+ "ORDER BY Name");
+
+			// st.setInt(1, department.getId());
+
+			rs = st.executeQuery(); // exc query
+			// cria um obj como retorono assosiado a um depart
+
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+			// chave e valor / dicionario / busca pelo Id do departamento
+
+			while (rs.next()) {
+				// confere se o departamento ja existe
+				Department dep = map.get(rs.getInt("DepartmentId"));
+
+				if (dep == null) { // verifica
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+
+				// Department dep = instantiateDepartment(rs);
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
+			}
+			return list;
+
+		} catch (
+
+		SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+			// nao fecha a conn pq isso é uma query // fecha noo programa
+		}
 	}
 
 	@Override
@@ -98,9 +138,9 @@ public class SellerDaoJDBC implements SellerDao {
 			st = conn.prepareStatement(
 					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
 							+ "ON seller.DepartmentId = department.Id " + "WHERE DepartmentId = ? " + "ORDER BY Name");
-			
+
 			st.setInt(1, department.getId());
-			
+
 			rs = st.executeQuery(); // exc query
 			// cria um obj como retorono assosiado a um depart
 
