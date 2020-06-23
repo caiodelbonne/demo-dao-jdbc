@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DB;
 import db.DbException;
@@ -44,45 +47,40 @@ public class SellerDaoJDBC implements SellerDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName " 
-					+ "FROM seller INNER JOIN department " 
-					+ "ON seller.DepartmentId = department.Id "  
-					+ "WHERE seller.Id = ?");
-		st.setInt(1,id);
-		rs= st.executeQuery();
-	// cria um obj como retorono assosiado a um depart 	
-		if(rs.next()) {
-			Department dep = instantiateDepartment(rs);
-			Seller obj = instantiateSeller(rs,dep);
-			return obj;
-		}
-		return null; // nao existe vendedor com id 
-	}
-		catch (SQLException e) {
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE seller.Id = ?");
+
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			if (rs.next()) {
+				Department dep = instantiateDepartment(rs);
+				Seller obj = instantiateSeller(rs, dep);
+				return obj;
+			}
+			return null;
+		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
-		}
-		finally {
+		} finally {
 			DB.closeStatement(st);
 			DB.closeResultSet(rs);
-			// nao fecha a conn pq isso é uma query // fecha noo programa
 		}
 	}
 
-	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException { // cap exception
-		Seller obj =new Seller();
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller obj = new Seller();
 		obj.setId(rs.getInt("Id"));
 		obj.setName(rs.getString("Name"));
 		obj.setEmail(rs.getString("Email"));
 		obj.setBaseSalary(rs.getDouble("BaseSalary"));
 		obj.setBirthDate(rs.getDate("BirthDate"));
-		obj.setDepartment(dep); // objeto departmento montado que é a variavel temp
+		obj.setDepartment(dep);//  variavel temporaria 
 		return obj;
 	}
 
 	private Department instantiateDepartment(ResultSet rs) throws SQLException {
 		Department dep = new Department();
 		dep.setId(rs.getInt("DepartmentId"));
-		dep.setName(rs.getString("DepName"));		
+		dep.setName(rs.getString("DepName"));
 		return null;
 	}
 
@@ -92,4 +90,47 @@ public class SellerDaoJDBC implements SellerDao {
 		return null;
 	}
 
+	@Override
+	public List<Seller> findByDepartment(Department department) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE DepartmentId = ? " + "ORDER BY Name");
+			
+			st.setInt(1, department.getId());
+			
+			rs = st.executeQuery(); // exc query
+			// cria um obj como retorono assosiado a um depart
+
+			List<Seller> list = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+			// chave e valor / dicionario / busca pelo Id do departamento
+
+			while (rs.next()) {
+				// confere se o departamento ja existe
+				Department dep = map.get(rs.getInt("DepartmentId"));
+
+				if (dep == null) { // verifica
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+
+				// Department dep = instantiateDepartment(rs);
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
+			}
+			return list;
+
+		} catch (
+
+		SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+			// nao fecha a conn pq isso é uma query // fecha noo programa
+		}
+	}
 }
