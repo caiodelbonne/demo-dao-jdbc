@@ -1,7 +1,7 @@
 package application;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
 
 import model.dao.DaoFactory;
 import model.dao.SellerDao;
@@ -11,7 +11,7 @@ import model.entities.Seller;
 public class Program {
 
 	public static void main(String[] args) {
-
+		Scanner sc = new Scanner(System.in);
 //		Department obj = new Department(1, "Books");
 //		Seller seller = new Seller(20, "Bob", "bob@bob", new Date(), 3000.0, obj);
 		SellerDao sellerDao = DaoFactory.createSellerDao();
@@ -43,6 +43,13 @@ public class Program {
 		seller.setName("Martha ");
 		sellerDao.update(seller);
 		System.out.println("Update completed");
+		
+
+		System.out.println("\n=== TEST 6: seller delete=====");
+		System.out.println("Delete id ");
+		int id = sc.nextInt();
+		sellerDao.deleteById(id);
+		System.out.println("operação concluida ");
 	}
 
 }
