@@ -17,7 +17,7 @@ import model.entities.Department;
 public class DepartmentDaoJDBC implements DepartmentDao {
 
 	private Connection conn;
-
+	PreparedStatement st= null;
 	public DepartmentDaoJDBC(Connection conn) {
 		this.conn = conn;
 	}
@@ -101,7 +101,18 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
 	@Override
 	public void update(Department obj) {
-
+		try {
+			st= conn.prepareStatement(
+					"UPDATE department SET Name = ? Where Id = ?");
+			st.setString(1,obj.getName());
+			st.setInt(2, obj.getId());
+			st.executeUpdate(); 
+		}catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override

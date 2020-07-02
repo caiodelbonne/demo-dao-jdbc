@@ -18,7 +18,13 @@ public class Program2 {
 		departmentDao.insert(novodepartment);
 		System.out.println("Departamento inserido Id = " + novodepartment.getId() + 
 							"nome do departamento " + novodepartment.getName());
-		
+	//		
+		System.out.println("= = = Update Test = = = ");
+		Department depUP = departmentDao.findById(7); 
+		depUP.setName("Game");
+		departmentDao.update(depUP);
+		System.out.println("Departamento alterado com sucesso " + depUP.getName());
+	
 	}
 
 }
