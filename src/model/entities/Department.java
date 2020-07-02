@@ -59,6 +59,6 @@ public class Department implements Serializable { // objetos ser convertido em s
 
 	@Override
 	public String toString() {
-		return "Department [id=" + id + ", name=" + name + "]";
+		return "Department [id = " + id + ", name = " + name + "]";
 	}
 }

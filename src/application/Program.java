@@ -1,5 +1,6 @@
 package application;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -21,7 +22,7 @@ public class Program {
 		System.out.println(seller);
 
 		System.out.println("\n=== TEST 2: seller findByDepartment =====");
-		Department department = new Department(1, null);
+		Department department = new Department(3, null);
 		List<Seller> list = sellerDao.findByDepartment(department);
 		for (Seller obj : list) {
 			System.out.println(obj);
