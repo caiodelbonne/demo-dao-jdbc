@@ -12,6 +12,13 @@ public class Program2 {
 		System.out.println(" === Testando FindBy Id department ===");
 		Department dep = departmentDao.findById(2);
 		System.out.println(dep);
+	
+		System.out.println(" === Testando insert ===");
+		Department novodepartment = new Department(null, "Banheiro");
+		departmentDao.insert(novodepartment);
+		System.out.println("Departamento inserido Id = " + novodepartment.getId() + 
+							"nome do departamento " + novodepartment.getName());
+		
 	}
 
 }
